@@ -1,0 +1,7 @@
+= Logger
+
+A simple PHP logger class. Because sometimes you only need something simple.
+
+  $logger = new Logger("development.log", Logger::INFO);
+
+  $logger->info("logging from the info level");
