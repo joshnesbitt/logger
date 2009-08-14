@@ -1,16 +1,17 @@
 <?php
 /**
 * Simple Logger Class
+*
 * @author Josh Nesbitt <josh@josh-nesbitt.net>
 *
-* By default will write to /log/filename.log
+* By default will write to path/to/logger/ + log/filename.log
 *
 **/
 class Logger {
-  var $file, $level, $stream;
+  var $file, $path, $level, $stream;
   const INFO  = 4;
-  const WARN  = 3;
-  const DEBUG = 2;
+  const DEBUG = 3;
+  const WARN  = 2;
   const ERROR = 1;
   const FATAL = 0;
   
@@ -18,63 +19,73 @@ class Logger {
 	{
 		$this->file = $file;
 		$this->level = $level;
-		$this->stream = fopen($_SERVER["DOCUMENT_ROOT"] . "/log/$this->file", "a") or die("Cannot write to file '$this->path'");
+		$this->path = $_SERVER["DOCUMENT_ROOT"] . "/log/$this->file";
+		$this->start();
 	}
 	
 	function info($string)
 	{
-	  if($this->level < self::INFO) return true;
-	  $this->log($string);
+	  return $this->check_level(self::INFO) ? true : $this->log($string);
 	}
 	
 	function warn($string)
 	{
-	  if($this->level < self::WARN) return true;
-	  $this->log($string);
+	  return $this->check_level(self::WARN) ? true : $this->log($string);
 	}
 	
 	function debug($string)
 	{
-	  if($this->level < self::DEBUG) return true;
-	  $this->log($string);
+	  return $this->check_level(self::DEBUG) ? true : $this->log($string);
 	}
 	
 	function error($string)
 	{
-	  if($this->level < self::ERROR) return true;
-	  $this->log($string);
+	  return $this->check_level(self::ERROR) ? true : $this->log($string);
 	}
 	
 	function fatal($string)
 	{
-	  if($this->level < self::FATAL) return true;
-	  $this->log($string);
+	  return $this->check_level(self::FATAL) ? true : $this->log($string);
+	}
+	
+	function clear()
+	{
+	  $this->close();
+	  $this->open("w");
+	  $this->close();
+	  $this->open();
+	}
+	
+	private function check_level($level)
+	{
+	  return $this->level < $level;
 	}
 	
 	private function log($string)
 	{
 	  $this->write("[". date('l jS F Y : h:i:sa') . "] ". $string . "\r\n");
 	}
-	
+  
 	private function write($string)
 	{
 	  return fwrite($this->stream, $string);
 	}
+  
+	private function start()
+	{
+	  return $this->open();
+	}
 	
-	private function cut()
+	private function open($mode="a")
+	{
+	  return $this->stream = fopen($this->path, $mode) or die("Cannot write to file '$this->path', please ensure '$this->path' is writable.");
+	}
+	
+	private function close()
 	{
 	  return fclose($this->stream);
 	}
+	
 }
-
-$logger = new Logger("development.log", Logger::INFO);
-
-$logger->info("--> info");
-$logger->warn("--> warn");
-$logger->debug("--> debug");
-$logger->error("--> error");
-$logger->fatal("--> fatal");
-
-# TODO: finish me...
 
 ?>

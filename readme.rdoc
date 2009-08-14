@@ -1,7 +1,23 @@
 = Logger
 
-A simple PHP logger class. If you only need something simple:
+A simple PHP logger class for logging out to a specified file.
+
+Log levels can be one of the following:
+
+  INFO
+  DEBUG
+  WARN
+  ERROR
+  FATAL
+
+Output is only written to file if the log level is within the scope of the level specified when instantiating the logger (e.g. a info call would not be written if the log level was set to WARN).
+
+== Usage
 
   $logger = new Logger("development.log", Logger::INFO);
-
-  $logger->info("logging from the info level");
+  
+  # would create a new log file at /path/to/logger/script/log/development.log
+  
+  $logger->info("Why hello there Ted");
+  
+  # writes "Why hello there Ted" to development.log
